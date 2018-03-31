@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class VirtualTouristViewController: UIViewController {
     
@@ -16,6 +17,7 @@ class VirtualTouristViewController: UIViewController {
     @IBOutlet weak var deletePinButton: UIButton!
     
     var dataController : DataController!
+    var pins : [Pin] = []
     
     var longPressGestureRecognizer : UILongPressGestureRecognizer!
     override func viewDidLoad() {
@@ -26,9 +28,12 @@ class VirtualTouristViewController: UIViewController {
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self,action: #selector(addAnnotations(longPressgestureRecongizer :)))
         longPressGestureRecognizer.minimumPressDuration = 2.0
         mapView.addGestureRecognizer(longPressGestureRecognizer)
-        
-        
-        
+
+        let fetchRequest : NSFetchRequest<Pin> = Pin.fetchRequest()
+        if let result = try? dataController.viewContext.fetch(fetchRequest){
+            pins = result
+            print(pins.count)
+        }
     }
 
 
@@ -65,7 +70,7 @@ class VirtualTouristViewController: UIViewController {
         }
         
     }
-    
+ 
     
 }
 
