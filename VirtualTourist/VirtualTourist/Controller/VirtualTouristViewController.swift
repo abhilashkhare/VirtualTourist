@@ -112,19 +112,28 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
     }
 
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        if let selectedPin = view.annotation as? Pin {
         print("didselect")
-        selectPin(selectedPin)
+//            selectPin(selectedPin as! Pin)
+            let viewController = self.storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
+        if let lat = view.annotation?.coordinate.latitude  {
+            viewController.pin?.lat = lat
         }
-    }
+        if let lon = view.annotation?.coordinate.longitude {
+            viewController.pin?.lon = lon
+        }
+            viewController.dataController = self.dataController
+            self.navigationController?.pushViewController(viewController, animated: true)
+        
+        }
+    
 
     
-    func selectPin(_ selectedPin : Pin){
-        let viewController = self.storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
-        viewController.pin = selectedPin
-        viewController.dataController = self.dataController
-        self.navigationController?.pushViewController(viewController, animated: true)
-    }
+//    func selectPin(_ selectedPin : Pin){
+//        let viewController = self.storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
+//        viewController.pin = selectedPin
+//        viewController.dataController = self.dataController
+//        self.navigationController?.pushViewController(viewController, animated: true)
+//    }
 
 
  
