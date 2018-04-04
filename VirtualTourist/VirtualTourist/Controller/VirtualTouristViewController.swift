@@ -148,11 +148,13 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
                             print("annotation.coordinate.longitude \(annotation.coordinate.longitude)")
                             print("lon \(lon)")
 
-                            mapView.removeAnnotation(annotation)
+                            DispatchQueue.main.async {
+                                self.mapView.removeAnnotation(annotation)
+                                }
                         }
                     }
-            }
-         }
+              }
+          }
         }
     }
 
