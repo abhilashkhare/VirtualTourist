@@ -7,3 +7,8 @@
 //
 
 import Foundation
+
+public struct Values {
+    static var lat : Double = 0.00
+    static var lon : Double = 0.00
+}

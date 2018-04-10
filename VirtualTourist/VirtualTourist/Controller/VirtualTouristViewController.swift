@@ -26,13 +26,13 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
-       deletePinsLabel.isHidden = true
-       deletePinsLabel.isEnabled = false
-    
+        deletePinsLabel.isHidden = true
+        deletePinsLabel.isEnabled = false
+        
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self,action: #selector(addAnnotations(longPressgestureRecongizer :)))
-        longPressGestureRecognizer.minimumPressDuration = 2.0
+        longPressGestureRecognizer.minimumPressDuration = 1.0
         mapView.addGestureRecognizer(longPressGestureRecognizer)
-
+        
         
         if let result = try? dataController.viewContext.fetch(fetchRequest){
             pins = result
@@ -54,37 +54,37 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
             
         }
     }
-
-
+    
+    
     @IBAction func pressEdit(_ sender: Any) {
         if(editButton.title == "Edit"){
-        deletePinsLabel.isHidden = false
-        deletePinsLabel.isEnabled = true
-        editButton.title = "Done"
-        toggleDelete = true
-        
+            deletePinsLabel.isHidden = false
+            deletePinsLabel.isEnabled = true
+            editButton.title = "Done"
+            toggleDelete = true
             
-    }
-    else{
-    deletePinsLabel.isHidden = true
-    deletePinsLabel.isEnabled = false
-    editButton.title = "Edit"
-    toggleDelete = false
-    }
+            
+        }
+        else{
+            deletePinsLabel.isHidden = true
+            deletePinsLabel.isEnabled = false
+            editButton.title = "Edit"
+            toggleDelete = false
+        }
     }
     
-
- 
+    
+    
     
     @objc func addAnnotations(longPressgestureRecongizer : UILongPressGestureRecognizer){
         
         if longPressgestureRecongizer.state == UIGestureRecognizerState.began {
             var touchPoint = longPressgestureRecongizer.location(in: mapView)
             var newCoordinates = mapView.convert(touchPoint, toCoordinateFrom: mapView)
-           let annotation = MKPointAnnotation()
+            let annotation = MKPointAnnotation()
             annotation.coordinate = newCoordinates
             annotations.append(annotation)
-
+            
             let pin = Pin(context: self.dataController.viewContext)
             pin.lat = annotation.coordinate.latitude
             pin.lon = annotation.coordinate.longitude
@@ -97,70 +97,58 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        
         let reuseId = "pin"
-        
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
         
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.pinTintColor = .red
-            
-            
         }
         else {
             pinView!.annotation = annotation
-            pinView!.pinTintColor = .red
         }
-        
         return pinView
     }
-
+    
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         print("didselect")
         print("toggledelete  \(toggleDelete)")
-//            selectPin(selectedPin as! Pin)
+        mapView.deselectAnnotation(view.annotation, animated: false)
         if(toggleDelete == false){
             let viewController = self.storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
             if let lat = view.annotation?.coordinate.latitude  {
-                viewController.pin?.lat = lat
+                Values.lat =  lat
             }
             if let lon = view.annotation?.coordinate.longitude {
-                viewController.pin?.lon = lon
+                Values.lon = lon
+                
             }
             viewController.dataController = self.dataController
+            if let pin = view.annotation as? Pin {
+                viewController.pin = pin
+            }
             self.navigationController?.pushViewController(viewController, animated: true)
             
         }
-        
+            
         else if (toggleDelete == true){
-            if let lat = view.annotation?.coordinate.latitude, let lon = view.annotation?.coordinate.longitude{
-                if let result = try? dataController.viewContext.fetch(fetchRequest){
-                    for i in result {
-                        if((i.lat == lat) && (i.lon == lon)){
-                            dataController.viewContext.delete(i)
-                            try? dataController.viewContext.save()
-                            let annotation = MKPointAnnotation()
-                            annotation.coordinate.latitude = lat
-                            annotation.coordinate.longitude = lon
-                            print("annotation.coordinate.latitude \(annotation.coordinate.latitude)")
-                            print("lat \(lat)")
-                            print("annotation.coordinate.longitude \(annotation.coordinate.longitude)")
-                            print("lon \(lon)")
-
-                            DispatchQueue.main.async {
-                                self.mapView.removeAnnotation(annotation)
-                                }
+            if let result = try? dataController.viewContext.fetch(fetchRequest){
+                for i in result {
+                    if((i.lat == view.annotation?.coordinate.latitude) && (i.lon == view.annotation?.coordinate.longitude)){
+                        dataController.viewContext.delete(i)
+                        try? dataController.viewContext.save()
+                        DispatchQueue.main.async {
+                            self.mapView.removeAnnotation(view.annotation!)
                         }
                     }
-              }
-          }
+                }
+            }
         }
     }
-
     
-
-
+    
+    
+    
     
 }
 
