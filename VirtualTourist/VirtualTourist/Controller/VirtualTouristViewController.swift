@@ -91,6 +91,7 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
             try? dataController.viewContext.save()
             DispatchQueue.main.async {
                 self.mapView.addAnnotation(annotation)
+                self.pins.append(pin)
             }
         }
         
@@ -123,11 +124,16 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
                 Values.lon = lon
                 
             }
-            viewController.dataController = self.dataController
-            if let pin = view.annotation as? Pin {
-                viewController.pin = pin
+            DispatchQueue.main.async {
+                viewController.dataController = self.dataController
+                for pin in self.pins{
+                    if ((pin.lat == view.annotation?.coordinate.latitude) && (pin.lon == view.annotation?.coordinate.longitude)){
+                        viewController.pin = pin
+                    }
+                }
+                self.navigationController?.pushViewController(viewController, animated: true)
             }
-            self.navigationController?.pushViewController(viewController, animated: true)
+        
             
         }
             

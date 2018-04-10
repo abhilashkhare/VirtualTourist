@@ -24,7 +24,8 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
     fileprivate func setupFetchedResultsController() {
         let fetchRequest : NSFetchRequest<Photo> = Photo.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
+        fetchRequest.predicate = NSPredicate(format: "pin == %@",  argumentArray: [self.pin])
+        fetchRequest.sortDescriptors = []
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         do {
             try? fetchedResultsController.performFetch()
@@ -41,7 +42,7 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
             
                 for image in fetchedObjects! {
                     let fetchedImage  = image
-                    self.photos.append(fetchedImage)
+                    self.photos?.append(fetchedImage)
                 }
         }
     }
@@ -56,7 +57,6 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         collectionView.dataSource = self
         collectionView.delegate = self
         print("Pin did load \(pin)")
-        setupFetchedResultsController()
         }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -119,20 +119,28 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupFetchedResultsController()
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-       return photos.count
+        if let count = photos?.count{
+            return count
+        }
+        return 1
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageViewCell", for: indexPath) as! ImageViewCell
         
-        let photo = photos[indexPath.row]
+        if let photo = photos?[indexPath.row]{
         if let selectPhoto  = photo.image{
             cell.imageView.image =  UIImage(data: selectPhoto as Data)
         }
-        
+        }
         return cell
     }
     
