@@ -6,6 +6,7 @@
 //  Copyright © 2018 Abhilash Khare. All rights reserved.
 //
 
+import UIKit
 import Foundation
 import CoreData
 import MapKit
@@ -14,11 +15,13 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
     @IBOutlet var mapView : MKMapView!
     @IBOutlet var collectionView : UICollectionView!
+    @IBOutlet var newCollectionButton : UIButton!
     var pin : Pin!
-    var photos : [Photo]!
+    var photos = [Photo]()
     var dataController : DataController!
     var imageURLString : [String] = []
-    
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+
     var fetchedResultsController : NSFetchedResultsController<Photo>!
     
     
@@ -34,16 +37,21 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         }
         
         let fetchedObjects = fetchedResultsController.fetchedObjects
-        if fetchedObjects?.count == 0 {
-            getPhotosFromFlickr()
-        } else
+        print(fetchedObjects?.count)
             if fetchedObjects?.count != 0{
             print("Count of images \(fetchedObjects?.count)")
             
                 for image in fetchedObjects! {
                     let fetchedImage  = image
-                    self.photos?.append(fetchedImage)
+                    self.photos.append(fetchedImage)
                 }
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+                
+        }
+        if fetchedObjects?.count == 0 {
+            getPhotosFromFlickr()
         }
     }
     
@@ -54,9 +62,12 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         annotation.coordinate.longitude = Values.lon
         mapView.addAnnotation(annotation)
         mapView.delegate = self
+        print("Pin did load \(pin)")
+        
         collectionView.dataSource = self
         collectionView.delegate = self
-        print("Pin did load \(pin)")
+        
+
         }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -84,6 +95,9 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                     print ("success")
                     print(result!)
                     if let photos = result!["photos"] as! [String:AnyObject]? {
+                        if let pages = photos["pages"] {
+                            Constants.API.PAGE_VALUE = pages as! String
+                        }
                         if let photoArray = photos["photo"] as! [[String:AnyObject]]?{
                             
                             for images in photoArray{
@@ -93,14 +107,26 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                             
                         }
                     }
+                    if self.imageURLString.count > 0 {
                     for i in 0...self.imageURLString.count-1{
                         print(self.imageURLString[i])
                         if let imageData = try? Data(contentsOf: URL(string: self.imageURLString[i])!) {
                             let image = Photo(context: self.dataController.viewContext)
                             image.image = imageData
+                            self.photos.append(image)
+                        
                             image.pin = self.pin
                             try? self.dataController.viewContext.save()
                         }
+                    }
+                        DispatchQueue.main.async {
+                            self.collectionView.reloadData()
+                        }
+                        
+                    }
+                    else
+                    {
+                        print("No Pics found")
                     }
                     
                 }
@@ -118,30 +144,86 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setupFetchedResultsController()
+        
+        
+        let space:CGFloat = 3.0
+        let dimension = (view.frame.size.width - (2 * space)) / 3.0
+        
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSize(width: dimension, height: dimension)
+        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        
         DispatchQueue.main.async {
+            self.setupFetchedResultsController()
             self.collectionView.reloadData()
         }
 
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let count = photos?.count{
-            return count
-        }
-        return 1
+            print("numberOfItemsInSection \(photos.count)")
+            return photos.count
+   
         
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageViewCell", for: indexPath) as! ImageViewCell
-        
-        if let photo = photos?[indexPath.row]{
+        cell.activityIndicatorView.hidesWhenStopped = true
+        cell.activityIndicatorView.startAnimating()
+        cell.activityIndicatorView.isHidden = false
+        let photo = photos[indexPath.row]
         if let selectPhoto  = photo.image{
+            cell.activityIndicatorView.stopAnimating()
             cell.imageView.image =  UIImage(data: selectPhoto as Data)
-        }
         }
         return cell
     }
     
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+      let alert = UIAlertController(title: nil, message: "Delete Picture ? ", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { (action) in
+            self.dataController.viewContext.delete(self.photos[indexPath.row])
+            self.photos.remove(at: indexPath.row )
+            
+            DispatchQueue.main.async {
+                do {
+                    try self.dataController.viewContext.save()
+                    self.collectionView.deleteItems(at: [indexPath])
+                    collectionView.reloadData()
+                }
+                catch{
+                    print("Error \(error.localizedDescription)")
+                }
+                
+            }
+            
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+
+    @IBAction func tapNewCollection( _ sender : Any){
+        if Constants.API.PAGE_VALUE != "0" && Constants.API.PAGE_VALUE != "1"
+        {
+            let randomPage = arc4random_uniform(UInt32(Constants.API.PAGE_VALUE)!) + 1
+            Constants.API.PAGE_VALUE = String(randomPage)
+            print(Constants.API.PAGE_VALUE)
+        }
+        else{
+        let alert = UIAlertController(title: nil, message: "No new images available", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+                alert.dismiss(animated: true, completion: nil)
+            }))
+        }
+    }
+    
+
 }

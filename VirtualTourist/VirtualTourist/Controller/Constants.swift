@@ -30,7 +30,7 @@ public struct Constants{
         static let EXTRAS  = "extras"
         static let MEDIUMURL = "url_m"
         static let PAGE = "page"
-        static let PAGE_VALUE = "1"
+        static var PAGE_VALUE = "1"
         static let PERPAGE = "per_page"
         static let PERPAGE_VALUE = "15"
 
