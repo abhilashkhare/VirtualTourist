@@ -86,7 +86,7 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
-                                    <action selector="tapNewCollection:" destination="d9f-FC-Beq" eventType="touchDragInside" id="qB1-sX-qck"/>
+                                    <action selector="tapNewCollection:" destination="d9f-FC-Beq" eventType="touchUpInside" id="JQd-wI-2s4"/>
                                 </connections>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="nRm-aA-7Ra">

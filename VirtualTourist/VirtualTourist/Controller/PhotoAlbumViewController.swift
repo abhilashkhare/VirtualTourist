@@ -95,9 +95,6 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                     print ("success")
                     print(result!)
                     if let photos = result!["photos"] as! [String:AnyObject]? {
-                        if let pages = photos["pages"] {
-                            Constants.API.PAGE_VALUE = pages as! String
-                        }
                         if let photoArray = photos["photo"] as! [[String:AnyObject]]?{
                             
                             for images in photoArray{
@@ -211,18 +208,23 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
 
     @IBAction func tapNewCollection( _ sender : Any){
-        if Constants.API.PAGE_VALUE != "0" && Constants.API.PAGE_VALUE != "1"
-        {
-            let randomPage = arc4random_uniform(UInt32(Constants.API.PAGE_VALUE)!) + 1
-            Constants.API.PAGE_VALUE = String(randomPage)
-            print(Constants.API.PAGE_VALUE)
+
+        DispatchQueue.main.async {
+        self.photos = []
+        self.imageURLString = []
+        self.collectionView.reloadData()
         }
-        else{
-        let alert = UIAlertController(title: nil, message: "No new images available", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-                alert.dismiss(animated: true, completion: nil)
-            }))
+        
+        for item in photos {
+            self.dataController.viewContext.delete(item)
+            
         }
+        print("Photo count \(photos.count)")
+
+        try? dataController.viewContext.save()
+        
+        getPhotosFromFlickr()
+        self.collectionView.reloadData()
     }
     
 
