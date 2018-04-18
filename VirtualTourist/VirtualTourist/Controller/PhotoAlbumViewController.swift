@@ -66,7 +66,10 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         
         collectionView.dataSource = self
         collectionView.delegate = self
-        
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+
 
         }
     
@@ -94,37 +97,44 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                 else if success == true {
                     print ("success")
                     print(result!)
-                    if let photos = result!["photos"] as! [String:AnyObject]? {
-                        if let photoArray = photos["photo"] as! [[String:AnyObject]]?{
+                    if let photoset = result!["photos"] as! [String:AnyObject]? {
+                        if let photoArray = photoset["photo"] as! [[String:AnyObject]]?{
                             
                             for images in photoArray{
                                 let url_m = images["url_m"] as! String
-                                self.imageURLString.append(url_m)
+                             //   self.imageURLString.append(url_m)
+                                let photo = Photo(imageURL: url_m, context: self.dataController.viewContext)
+                                photo.pin = self.pin
+                                self.photos.append(photo)
                             }
+                             try? self.dataController.viewContext.save()
                             
                         }
                     }
-                    if self.imageURLString.count > 0 {
-                    for i in 0...self.imageURLString.count-1{
-                        print(self.imageURLString[i])
-                        if let imageData = try? Data(contentsOf: URL(string: self.imageURLString[i])!) {
-                            let image = Photo(context: self.dataController.viewContext)
-                            image.image = imageData
-                            self.photos.append(image)
-                        
-                            image.pin = self.pin
-                            try? self.dataController.viewContext.save()
-                        }
-                    }
-                        DispatchQueue.main.async {
-                            self.collectionView.reloadData()
-                        }
-                        
-                    }
-                    else
-                    {
-                        print("No Pics found")
-                    }
+                    DispatchQueue.main.async {
+                                                self.collectionView.reloadData()
+                                                }
+//                    if self.imageURLString.count > 0 {
+//                    for i in 0...self.imageURLString.count-1{
+//                        print(self.imageURLString[i])
+//                        if let imageData = try? Data(contentsOf: URL(string: self.imageURLString[i])!) {
+//                            let image = Photo(context: self.dataController.viewContext)
+//                            image.image = imageData
+//                            self.photos.append(image)
+//
+//                            image.pin = self.pin
+//                            try? self.dataController.viewContext.save()
+//                        }
+//                    }
+//                        DispatchQueue.main.async {
+//                            self.collectionView.reloadData()
+//                        }
+//
+//                    }
+//                    else
+//                    {
+//                        print("No Pics found")
+//                    }
                     
                 }
                 
@@ -141,7 +151,6 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         
         let space:CGFloat = 3.0
         let dimension = (view.frame.size.width - (2 * space)) / 3.0
@@ -170,11 +179,17 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         cell.activityIndicatorView.hidesWhenStopped = true
         cell.activityIndicatorView.startAnimating()
         cell.activityIndicatorView.isHidden = false
-        let photo = photos[indexPath.row]
-        if let selectPhoto  = photo.image{
-            cell.activityIndicatorView.stopAnimating()
-            cell.imageView.image =  UIImage(data: selectPhoto as Data)
-        }
+//        let photo = photos[indexPath.row]
+//        if let selectPhoto  = photo.image{
+//            cell.imageView.image =  UIImage(data: selectPhoto as Data)
+//        }
+        
+        if let imageData = try? Data(contentsOf: URL(string: self.photos[indexPath.row].url!)!) {
+            cell.imageView.image =  UIImage(data: imageData)
+            }
+        
+        cell.activityIndicatorView.stopAnimating()
+
         return cell
     }
     
@@ -211,8 +226,7 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
 
         DispatchQueue.main.async {
         self.photos = []
-        self.imageURLString = []
-        self.collectionView.reloadData()
+   //     self.imageURLString = []
         }
         
         for item in photos {

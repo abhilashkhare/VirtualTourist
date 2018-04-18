@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		340D15AF20870DCF008814C0 /* ExtendPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340D15AE20870DCF008814C0 /* ExtendPhoto.swift */; };
 		34113BC0206E1E53006C44B5 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34113BBF206E1E53006C44B5 /* DataController.swift */; };
 		341BAFB5207373A300F5AC06 /* ImageViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341BAFB4207373A300F5AC06 /* ImageViewCell.swift */; };
 		341BAFB72074B22B00F5AC06 /* VariableStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341BAFB62074B22B00F5AC06 /* VariableStorage.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		340D15AE20870DCF008814C0 /* ExtendPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendPhoto.swift; sourceTree = "<group>"; };
 		34113BBF206E1E53006C44B5 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		341BAFB4207373A300F5AC06 /* ImageViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewCell.swift; sourceTree = "<group>"; };
 		341BAFB62074B22B00F5AC06 /* VariableStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableStorage.swift; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 				344B1FB02073243700457AFA /* PhotoAlbumViewController.swift */,
 				341BAFB62074B22B00F5AC06 /* VariableStorage.swift */,
 				341BAFBA207737B100F5AC06 /* Constants.swift */,
+				340D15AE20870DCF008814C0 /* ExtendPhoto.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -185,6 +188,7 @@
 				34113BC0206E1E53006C44B5 /* DataController.swift in Sources */,
 				34A8D741206CD03B00C1F41A /* AppDelegate.swift in Sources */,
 				341BAFB72074B22B00F5AC06 /* VariableStorage.swift in Sources */,
+				340D15AF20870DCF008814C0 /* ExtendPhoto.swift in Sources */,
 				344B1FB12073243700457AFA /* PhotoAlbumViewController.swift in Sources */,
 				341BAFB5207373A300F5AC06 /* ImageViewCell.swift in Sources */,
 				34A8D749206CD03B00C1F41A /* VirtualTourist.xcdatamodeld in Sources */,
