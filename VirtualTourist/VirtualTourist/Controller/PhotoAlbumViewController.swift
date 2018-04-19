@@ -186,9 +186,10 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                 
                 cell.imageView.image = UIImage(data: imageData!)
                 cell.activityIndicatorView.stopAnimating()
-                let photo = self.fetchedResultsController.fetchedObjects![indexPath.row]
-                photo.image = imageData!
+                
+                self.photos[indexPath.row].image = imageData!
                 try? self.dataController.viewContext.save()
+                
             }
         }
         return cell

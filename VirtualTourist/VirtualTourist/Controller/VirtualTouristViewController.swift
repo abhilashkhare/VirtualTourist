@@ -30,7 +30,7 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
         deletePinsLabel.isEnabled = false
         
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self,action: #selector(addAnnotations(longPressgestureRecongizer :)))
-        longPressGestureRecognizer.minimumPressDuration = 1.0
+        longPressGestureRecognizer.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longPressGestureRecognizer)
         
         
