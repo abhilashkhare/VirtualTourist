@@ -114,15 +114,19 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                             
                         }
                     }
+                    
                     DispatchQueue.main.async {
                         if !self.photos.isEmpty{
                             self.collectionView.reloadData()
                         }
                     }
+
                 }
                 
             }
-            
+        
+        
+        
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -164,22 +168,29 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         cell.activityIndicatorView.isHidden = false
         
         if let imageData = self.photos[indexPath.row].image {
-            print("existing")
             cell.imageView.image = UIImage(data: imageData)
             cell.activityIndicatorView.stopAnimating()
         } else {
-         print("downloading")
+            if photos.count > 0
+            {
+                print ("Count->> \(photos.count)")
+                print("present \(indexPath.row)")
             downloadImage(imagePath: self.photos[indexPath.row].url!) { (imageData, error) in
                 
-                cell.imageView.image = UIImage(data: imageData!)
-                cell.activityIndicatorView.stopAnimating()
+                DispatchQueue.main.async {
+                    cell.imageView.image = UIImage(data: imageData!)
+                    cell.activityIndicatorView.stopAnimating()
+
+                }
                 let photo = self.fetchedResultsController.fetchedObjects![indexPath.row]
                 photo.image = imageData!
                 try? self.dataController.viewContext.save()
                 }
+            }
         }
         return cell
     }
+
     
     func downloadImage( imagePath:String, completionHandler: @escaping (_ imageData: Data?, _ errorString: String?) -> Void){
         let session = URLSession.shared
@@ -188,14 +199,13 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         
         let task = session.dataTask(with: request as URLRequest) {data, response, downloadError in
             
-            DispatchQueue.main.async {
                 if downloadError != nil {
                     completionHandler(nil, "Could not download image \(imagePath)")
                 } else {
                     
                     completionHandler(data, nil)
                 }
-            }
+            
         }
         task.resume()
     }
