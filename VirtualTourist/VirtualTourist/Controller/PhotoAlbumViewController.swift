@@ -46,7 +46,9 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                     self.photos.append(fetchedImage)
                 }
                 DispatchQueue.main.async {
-                    self.collectionView.reloadData()
+                    if !self.photos.isEmpty{
+                        self.collectionView.reloadData()
+                    }
                 }
                 
         }
@@ -67,7 +69,9 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         collectionView.dataSource = self
         collectionView.delegate = self
         DispatchQueue.main.async {
+            if !self.photos.isEmpty{
             self.collectionView.reloadData()
+            }
         }
 
 
@@ -89,7 +93,6 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
     func getPhotosFromFlickr( )
     {
-        DispatchQueue.main.async {
             FlickerClient.sharedInstance().getPhotosFromFlicker { (success, result, error) in
                 if success == false {
                     print("Error retrieving photos")
@@ -112,35 +115,14 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                         }
                     }
                     DispatchQueue.main.async {
-                                                self.collectionView.reloadData()
-                                                }
-//                    if self.imageURLString.count > 0 {
-//                    for i in 0...self.imageURLString.count-1{
-//                        print(self.imageURLString[i])
-//                        if let imageData = try? Data(contentsOf: URL(string: self.imageURLString[i])!) {
-//                            let image = Photo(context: self.dataController.viewContext)
-//                            image.image = imageData
-//                            self.photos.append(image)
-//
-//                            image.pin = self.pin
-//                            try? self.dataController.viewContext.save()
-//                        }
-//                    }
-//                        DispatchQueue.main.async {
-//                            self.collectionView.reloadData()
-//                        }
-//
-//                    }
-//                    else
-//                    {
-//                        print("No Pics found")
-//                    }
-                    
+                        if !self.photos.isEmpty{
+                            self.collectionView.reloadData()
+                        }
+                    }
                 }
                 
             }
             
-        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -179,18 +161,41 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         cell.activityIndicatorView.hidesWhenStopped = true
         cell.activityIndicatorView.startAnimating()
         cell.activityIndicatorView.isHidden = false
-//        let photo = photos[indexPath.row]
-//        if let selectPhoto  = photo.image{
-//            cell.imageView.image =  UIImage(data: selectPhoto as Data)
-//        }
         
-        if let imageData = try? Data(contentsOf: URL(string: self.photos[indexPath.row].url!)!) {
-            cell.imageView.image =  UIImage(data: imageData)
-            }
-        
-        cell.activityIndicatorView.stopAnimating()
-
+        if let imageData = self.photos[indexPath.row].image {
+            cell.imageView.image = UIImage(data: imageData)
+            cell.activityIndicatorView.stopAnimating()
+        } else {
+         
+            downloadImage(imagePath: self.photos[indexPath.row].url!) { (imageData, error) in
+                
+                cell.imageView.image = UIImage(data: imageData!)
+                cell.activityIndicatorView.stopAnimating()
+                let photo = self.fetchedResultsController.fetchedObjects![indexPath.row]
+                photo.image = imageData!
+                try? self.dataController.viewContext.save()
+                }
+        }
         return cell
+    }
+    
+    func downloadImage( imagePath:String, completionHandler: @escaping (_ imageData: Data?, _ errorString: String?) -> Void){
+        let session = URLSession.shared
+        let imgURL = NSURL(string: imagePath)
+        let request: NSURLRequest = NSURLRequest(url: imgURL! as URL)
+        
+        let task = session.dataTask(with: request as URLRequest) {data, response, downloadError in
+            
+            DispatchQueue.main.async {
+                if downloadError != nil {
+                    completionHandler(nil, "Could not download image \(imagePath)")
+                } else {
+                    
+                    completionHandler(data, nil)
+                }
+            }
+        }
+        task.resume()
     }
     
     
@@ -238,8 +243,9 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         try? dataController.viewContext.save()
         
         getPhotosFromFlickr()
-        self.collectionView.reloadData()
-    }
+        if !self.photos.isEmpty{
+            self.collectionView.reloadData()
+        }    }
     
 
 }
