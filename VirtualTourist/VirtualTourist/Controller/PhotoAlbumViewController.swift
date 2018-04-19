@@ -144,8 +144,9 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         
         DispatchQueue.main.async {
             self.setupFetchedResultsController()
-            self.collectionView.reloadData()
-        }
+            if !self.photos.isEmpty{
+                self.collectionView.reloadData()
+            }        }
 
     }
     
@@ -163,10 +164,11 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         cell.activityIndicatorView.isHidden = false
         
         if let imageData = self.photos[indexPath.row].image {
+            print("existing")
             cell.imageView.image = UIImage(data: imageData)
             cell.activityIndicatorView.stopAnimating()
         } else {
-         
+         print("downloading")
             downloadImage(imagePath: self.photos[indexPath.row].url!) { (imageData, error) in
                 
                 cell.imageView.image = UIImage(data: imageData!)
