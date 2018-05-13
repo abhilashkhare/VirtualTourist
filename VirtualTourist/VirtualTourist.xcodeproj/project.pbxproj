@@ -54,6 +54,9 @@
 		34113BBE206E1E33006C44B5 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				341BAFB62074B22B00F5AC06 /* VariableStorage.swift */,
+				341BAFBA207737B100F5AC06 /* Constants.swift */,
+				340D15AE20870DCF008814C0 /* ExtendPhoto.swift */,
 				34113BBF206E1E53006C44B5 /* DataController.swift */,
 				341BAFB82074B9ED00F5AC06 /* FlickrClient.swift */,
 			);
@@ -65,9 +68,6 @@
 			children = (
 				34A8D742206CD03B00C1F41A /* VirtualTouristViewController.swift */,
 				344B1FB02073243700457AFA /* PhotoAlbumViewController.swift */,
-				341BAFB62074B22B00F5AC06 /* VariableStorage.swift */,
-				341BAFBA207737B100F5AC06 /* Constants.swift */,
-				340D15AE20870DCF008814C0 /* ExtendPhoto.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -99,9 +99,9 @@
 		34A8D73F206CD03B00C1F41A /* VirtualTourist */ = {
 			isa = PBXGroup;
 			children = (
+				34113BBE206E1E33006C44B5 /* Model */,
 				341BAFB32073738500F5AC06 /* View */,
 				34113BC2206E1F56006C44B5 /* Controller */,
-				34113BBE206E1E33006C44B5 /* Model */,
 				34A8D740206CD03B00C1F41A /* AppDelegate.swift */,
 				34A8D744206CD03B00C1F41A /* Main.storyboard */,
 				34A8D74A206CD03B00C1F41A /* Assets.xcassets */,

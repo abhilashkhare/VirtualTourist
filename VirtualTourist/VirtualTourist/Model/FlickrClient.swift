@@ -75,7 +75,7 @@ class FlickerClient{
     func taskForGETMethod(_ parameters : [String : AnyObject] , completionHandlerForGETMethod : @escaping ( _ result : AnyObject? , _ error : String?)-> Void)  {
         let URL = parametersToURL(parameters)
         print(URL)
-        let request = URLRequest(url: parametersToURL(parameters))
+        let request = URLRequest(url: URL)
         
   
         let task = session.dataTask(with: request){(data,response,error) in
