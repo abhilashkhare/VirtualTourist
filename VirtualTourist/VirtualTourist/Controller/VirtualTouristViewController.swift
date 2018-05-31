@@ -47,7 +47,6 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
                 annotation.coordinate.longitude = lon
                 annotations.append(annotation)
             }
-            
             DispatchQueue.main.async {
                 self.mapView.addAnnotations(self.annotations)
             }
@@ -62,8 +61,6 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
             deletePinsLabel.isEnabled = true
             editButton.title = "Done"
             toggleDelete = true
-            
-            
         }
         else{
             deletePinsLabel.isHidden = true
@@ -122,7 +119,6 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
             }
             if let lon = view.annotation?.coordinate.longitude {
                 Values.lon = lon
-                
             }
             DispatchQueue.main.async {
                 viewController.dataController = self.dataController
@@ -135,9 +131,7 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
             }
         
             
-        }
-            
-        else if (toggleDelete == true){
+        } else if (toggleDelete == true){
             if let result = try? dataController.viewContext.fetch(fetchRequest){
                 for i in result {
                     if((i.lat == view.annotation?.coordinate.latitude) && (i.lon == view.annotation?.coordinate.longitude)){
@@ -151,10 +145,5 @@ class VirtualTouristViewController: UIViewController,MKMapViewDelegate {
             }
         }
     }
-    
-    
-    
-    
-    
 }
 

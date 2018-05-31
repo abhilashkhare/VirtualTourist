@@ -13,6 +13,5 @@ extension Photo  {
     convenience init(imageURL : String, context : NSManagedObjectContext) {
         self.init(context: context)
         self.url = imageURL
-        
     }
 }

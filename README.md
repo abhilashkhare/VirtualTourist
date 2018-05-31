@@ -1,6 +1,6 @@
 # Virtual Tourist
 
-Virtual Tourist app is written in SWIFT 4. This app allows users to tour the world without leaving the comforts of their couch. This app allows you to drop pins on a map and pull up Flickr images associated with that location. Locations and images are persisted using Core Data.
+Virtual Tourist app is written in SWIFT 4. This app allows users to tour the world without leaving the comforts of their couch. This app allows you to drop pins on a map and pull up Flickr images associated with that location. Dropped pins could also be deleted with tapping. Locations and images are persisted using Core Data.
 
 
 # Installation

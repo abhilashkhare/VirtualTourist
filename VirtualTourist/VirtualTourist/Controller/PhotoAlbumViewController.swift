@@ -68,9 +68,7 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         collectionView.delegate = self
         DispatchQueue.main.async {
             self.collectionView.reloadData()
-        }
-
-
+            }
         }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -89,7 +87,7 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
     
     func getPhotosFromFlickr( )
     {
-            FlickerClient.sharedInstance().getPhotosFromFlicker { (success, result, error) in
+        FlickerClient.sharedInstance.getPhotosFromFlicker { (success, result, error) in
                 if success == false {
                     print("Error retrieving photos")
                 }
@@ -113,9 +111,6 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                     DispatchQueue.main.async {
                                                 self.collectionView.reloadData()
                                                 }
-
-                    
-                
                 
             }
             
@@ -143,14 +138,11 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
             self.setupFetchedResultsController()
             self.collectionView.reloadData()
         }
-
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
             print("numberOfItemsInSection \(photos.count)")
             return photos.count
-   
-        
     }
     
     func downloadImage( imagePath:String, completionHandler: @escaping (_ imageData: Data?, _ errorString: String?) -> Void){
@@ -186,15 +178,12 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                 
                 cell.imageView.image = UIImage(data: imageData!)
                 cell.activityIndicatorView.stopAnimating()
-                
                 self.photos[indexPath.row].image = imageData!
                 try? self.dataController.viewContext.save()
-                
             }
         }
         return cell
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
@@ -212,7 +201,6 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
                 catch{
                     print("Error \(error.localizedDescription)")
                 }
-                
             }
             
         }))
@@ -221,26 +209,19 @@ class PhotoAlbumViewController : UIViewController,MKMapViewDelegate,UICollection
         }))
         self.present(alert, animated: true, completion: nil)
     }
-    
 
     @IBAction func tapNewCollection( _ sender : Any){
 
         DispatchQueue.main.async {
         self.photos = []
-   //     self.imageURLString = []
         }
         
         for item in photos {
             self.dataController.viewContext.delete(item)
-            
         }
         print("Photo count \(photos.count)")
-
         try? dataController.viewContext.save()
-        
         getPhotosFromFlickr()
         self.collectionView.reloadData()
     }
-    
-
 }

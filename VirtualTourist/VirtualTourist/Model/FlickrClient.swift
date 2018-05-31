@@ -8,10 +8,10 @@
 
 import Foundation
 
-class FlickerClient{
-    
+class FlickerClient{    
     let session = URLSession.shared
     var pageNumber = 0
+    static var sharedInstance = FlickerClient()
     
     func getPhotosFromFlicker(_ completionHandlerForGetPhotos : @escaping (_ success : Bool, _ result : AnyObject?, _ error : String?) -> Void){
         
@@ -58,10 +58,8 @@ class FlickerClient{
                                 } else
                                 if error != nil{
                                     completionHandlerForGetPhotos(false,nil,error)
-
                                 }
                             }
-                            
                         }
                     }
         
@@ -76,8 +74,6 @@ class FlickerClient{
         let URL = parametersToURL(parameters)
         print(URL)
         let request = URLRequest(url: URL)
-        
-  
         let task = session.dataTask(with: request){(data,response,error) in
             
             func sendError(_ error: String) {
@@ -124,17 +120,7 @@ class FlickerClient{
             let queryItem = URLQueryItem(name: key, value: "\(value)")
             components.queryItems?.append(queryItem)
         }
-        
         return components.url!
     }
-    
-    
-    class func sharedInstance() -> FlickerClient {
-        struct Singleton {
-            static var sharedInstance = FlickerClient()
-        }
-        return Singleton.sharedInstance
-    }
-    
     
 }
